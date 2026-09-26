@@ -1,0 +1,22 @@
+21
+Work_on_assignment_report 0
+Buy_milk 1
+Work_on_assignment_code 0
+Email_tutor_about_assignment! 0
+Buy_bread 0
+Work_on_assignment_presentation_slides 0
+Buy_Milk_and_eggs 0
+Email_tutor_about_exam_dates 1
+Clean_the_kitchen 0
+Call_mum 0
+Clean_the_bathroom 1
+Book_dentist_appointment 0
+Pay_the_electricity_bill 0
+Pay_the_phone_bill 0
+Read_chapter_3_of_textbook 0
+Read_chapter_4_of_textbook, 0
+Finish_assignment_report 0
+Water_the_plants 0
+Fix_bike 0
+Pump_up_tyres 0
+Fix_bike_pump 0

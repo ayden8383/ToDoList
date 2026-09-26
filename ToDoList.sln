@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ToDoList", "ToDoList\ToDoList.vcxproj", "{6DD727A5-DC89-41AE-8156-0D013129B088}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6DD727A5-DC89-41AE-8156-0D013129B088}.Debug|x64.ActiveCfg = Debug|x64
+		{6DD727A5-DC89-41AE-8156-0D013129B088}.Debug|x64.Build.0 = Debug|x64
+		{6DD727A5-DC89-41AE-8156-0D013129B088}.Debug|x86.ActiveCfg = Debug|Win32
+		{6DD727A5-DC89-41AE-8156-0D013129B088}.Debug|x86.Build.0 = Debug|Win32
+		{6DD727A5-DC89-41AE-8156-0D013129B088}.Release|x64.ActiveCfg = Release|x64
+		{6DD727A5-DC89-41AE-8156-0D013129B088}.Release|x64.Build.0 = Release|x64
+		{6DD727A5-DC89-41AE-8156-0D013129B088}.Release|x86.ActiveCfg = Release|Win32
+		{6DD727A5-DC89-41AE-8156-0D013129B088}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2BCF7343-E4C2-4AAD-8145-21C1DB1073F1}
+	EndGlobalSection
+EndGlobal
