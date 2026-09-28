@@ -30,3 +30,37 @@ std::vector<std::string> LCS::splitWords(const std::string& text)
 
 	return words;
 }
+
+void LCS::tokenize(const std::vector<Task> &tasks)
+{
+	//pass 1: split every task and give each new word the next ID, Starting at 1
+	std::vector<std::vector<std::string>> taskWords;
+
+	for (const Task& task : tasks) {
+		std::vector<std::string> words = splitWords(task.desctiption);
+
+		//check if the words is already in wordIds map. (word hasn't been seen before)
+		for (const std::string& word : words) {
+			if (wordIds.find(word) == wordIds.end()) {
+				int nextId = static_cast<int>(wordIds.size()) + 1;
+				wordIds[word] = nextId;
+			}
+		}
+
+		taskWords.push_back(words);
+	}
+
+	//Word IDs are 1..w. Seperators start at W + 1
+	int W = static_cast<int>(wordIds.size());
+
+	//pass 2: for each task, build the sequence with a unique sepeartor
+	for (int i = 0; i < static_cast<int>(tasks.size()); i++) {
+		for (const std::string& word : taskWords[i]) {
+			sequence.push_back(W + 1 + i);
+			taskof.push_back(i);
+		}
+	}
+
+	sequence.push_back(0);
+	taskof.push_back(-1);
+}
