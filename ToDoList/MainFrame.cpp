@@ -53,6 +53,9 @@ void MainFrame::AddSaveTasks()
 	for (int pos : lcs.getSuffixArray()) saLine << pos << " ";
 	wxLogDebug("suffixArray: %s", saLine);
 
+	wxString lcpLine;
+	for (int len : lcs.getLCP()) lcpLine << len << " ";
+	wxLogDebug("lcp: %s", lcpLine);
 
 	for (const Task& task : tasks) {
 		int index = checkListBox->GetCount();

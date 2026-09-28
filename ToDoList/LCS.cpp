@@ -7,6 +7,7 @@ LCS::LCS(const std::vector<Task>& tasks)
 {
 	tokenize(tasks);
 	buildSuffixArrayNaive();
+	buildLCP();
 }
 
 //format lists into a vector of words
@@ -83,4 +84,41 @@ void LCS::buildSuffixArrayNaive()
 			sequence.begin() + a, sequence.end(),
 			sequence.begin() + b, sequence.end());
 		});
+}
+
+// Kasai's algorithm: builds the LCP array in O(n).
+// Visits suffixes in text order, so each LCP starts from the previous one minus 1
+void LCS::buildLCP()
+{
+	int n = static_cast<int>(sequence.size());
+	lcp.assign(n, 0);
+
+	// rank[pos] = where the suffix starting at pos sits in sorted order
+	std::vector<int> rank(n);
+	for (int i = 0; i < n; i++) {
+		rank[suffixArray[i]] = i;
+	}
+
+	int h = 0;
+	for (int pos = 0; pos < n; pos++) {
+		// The first suffix in sorted order doesnt have a neighbor before it
+		if (rank[pos] == 0) {
+			h = 0;
+			continue;
+		}
+
+		int prev = suffixArray[rank[pos] - 1];
+
+		// Extend the match from h instead of from 0
+		while (pos + h < n && prev + h < n && sequence[pos + h] == sequence[prev + h]) {
+			h++;
+		}
+
+		lcp[rank[pos]] = h;
+
+		// The next suffix (pos + 1) shares at least h - 1 words with its neighbor
+		if (h > 0) {
+			h--;
+		}
+	}
 }
