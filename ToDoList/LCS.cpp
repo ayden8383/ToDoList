@@ -1,5 +1,5 @@
 #include "LCS.h"
-#include "cctype"
+#include <cctype>
 
 LCS::LCS(const std::vector<Task>& tasks)
 {
@@ -56,9 +56,11 @@ void LCS::tokenize(const std::vector<Task> &tasks)
 	//pass 2: for each task, build the sequence with a unique sepeartor
 	for (int i = 0; i < static_cast<int>(tasks.size()); i++) {
 		for (const std::string& word : taskWords[i]) {
-			sequence.push_back(W + 1 + i);
 			taskof.push_back(i);
 		}
+
+		sequence.push_back(W + 1 + i);
+		taskof.push_back(i);
 	}
 
 	sequence.push_back(0);
