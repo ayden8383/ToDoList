@@ -111,12 +111,19 @@ void LCS::dc3(const std::vector<int>& s, std::vector<int>& SA, int n, int K)
 	//  SA12 holds indexes into s12, not original positions:
 	// t < n0 -> position 3t + 1,  t >= n0 -> position 3(t - n0) + 2
 
-	// TEMPORARY part 3 test
-	wxString namesLine, sa12Line;
-	for (int i = 0; i < n02; i++) namesLine << s12[i] << " ";
-	for (int i = 0; i < n02; i++) sa12Line << SA12[i] << " ";
-	wxLogDebug("names: %s", namesLine);
-	wxLogDebug("SA12 after: %s", sa12Line);
+	std::vector<int> s0(n0);
+	std::vector<int> SA0(n0);
+	for (int i = 0, j = 0; i < n02; i++) {
+		if (SA12[i] < n0) {
+			s0[j++] = 3 * SA12[i];
+		}
+	}
+	radixPass(s0, SA0, s, 0, n0, K);
+
+	// TEMPORARY part 4 test
+	wxString sa0Line;
+	for (int i = 0; i < n0; i++) sa0Line << SA0[i] << " ";
+	wxLogDebug("SA0: %s", sa0Line);
 }
 
 //format lists into a vector of words
