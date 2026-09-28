@@ -1,9 +1,12 @@
 #include "LCS.h"
 #include <cctype>
+#include <algorithm>
+#include <numeric>
 
 LCS::LCS(const std::vector<Task>& tasks)
 {
 	tokenize(tasks);
+	buildSuffixArrayNaive();
 }
 
 //format lists into a vector of words
@@ -66,4 +69,18 @@ void LCS::tokenize(const std::vector<Task> &tasks)
 
 	sequence.push_back(0);
 	taskof.push_back(-1);
+}
+
+void LCS::buildSuffixArrayNaive() 
+{
+	int n = static_cast<int>(sequence.size());
+
+	suffixArray.resize(n);
+	std::iota(suffixArray.begin(), suffixArray.end(), 0); //0,1,2,...n-1
+
+	std::sort(suffixArray.begin(), suffixArray.end(), [this](int a, int b) {
+		return std::lexicographical_compare(
+			sequence.begin() + a, sequence.end(),
+			sequence.begin() + b, sequence.end());
+		});
 }
