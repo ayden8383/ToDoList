@@ -1,4 +1,4 @@
-#include <wx/log.h>   // temporary, for the radixPass test
+
 #include "LCS.h"
 #include <cctype>
 #include <algorithm>
@@ -9,13 +9,7 @@
 LCS::LCS(const std::vector<Task>& tasks)
 {
 	tokenize(tasks);
-
-	// TEMPORARY: check DC3 against the naive version
-	buildSuffixArrayNaive();
-	std::vector<int> naive = suffixArray;
 	buildSuffixArrayDC3();
-	wxLogDebug("DC3 matches naive: %s", (suffixArray == naive) ? "yes" : "NO");
-
 	buildLCP();
 }
 
