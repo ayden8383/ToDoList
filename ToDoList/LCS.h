@@ -30,6 +30,8 @@ private:
 	void buildSuffixArrayNaive(); //brute force approach
 	void buildLCP();
 
+	void buildSuffixArrayDC3(); //Actual algorithm we want to use
+
 	//radixPass for DC3 construction
 	static void radixPass(const std::vector<int>& in, std::vector<int>& out,
 		const std::vector<int>& keys, int offset, int n, int K);

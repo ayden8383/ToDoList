@@ -9,23 +9,14 @@
 LCS::LCS(const std::vector<Task>& tasks)
 {
 	tokenize(tasks);
+
+	// TEMPORARY: check DC3 against the naive version
 	buildSuffixArrayNaive();
+	std::vector<int> naive = suffixArray;
+	buildSuffixArrayDC3();
+	wxLogDebug("DC3 matches naive: %s", (suffixArray == naive) ? "yes" : "NO");
+
 	buildLCP();
-
-	// TEMPORARY dc3 test: "banana" with b=2, a=1, n=3
-	std::vector<int> s = { 2, 1, 3, 1, 3, 1, 0, 0, 0 };
-	std::vector<int> SA(6);
-	dc3(s, SA, 6, 3);
-
-	std::vector<int> m = { 2, 1, 4, 4, 1, 4, 4, 1, 3, 3, 1, 0, 0, 0 }; // mississippi
-	std::vector<int> SAm(11);
-	dc3(m, SAm, 11, 4);
-
-	wxString bananaLine, missLine;
-	for (int pos : SA) bananaLine << pos << " ";
-	for (int pos : SAm) missLine << pos << " ";
-	wxLogDebug("banana SA: %s", bananaLine);
-	wxLogDebug("mississippi SA: %s", missLine);
 }
 
 // One pass of stable counting sort, used by DC3.
@@ -257,6 +248,28 @@ void LCS::buildSuffixArrayNaive()
 			sequence.begin() + a, sequence.end(),
 			sequence.begin() + b, sequence.end());
 		});
+}
+
+// DC3 suffix array over the task sequence. O(n).
+void LCS::buildSuffixArrayDC3()
+{
+	int n = static_cast<int>(sequence.size());
+	suffixArray.assign(n, 0);
+
+	if (n < 2) {
+		return; 
+	}
+
+	// DC3 reserves 0 for its padding, so shift every value up by 1.
+	// The sentinel becomes 1: still unique and still the smallest.
+	std::vector<int> s(n + 3, 0);
+	int K = 0;
+	for (int i = 0; i < n; i++) {
+		s[i] = sequence[i] + 1;
+		K = std::max(K, s[i]);
+	}
+
+	dc3(s, suffixArray, n, K);
 }
 
 // Kasai's algorithm: builds the LCP array in O(n).
