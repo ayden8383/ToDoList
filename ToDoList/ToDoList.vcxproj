@@ -136,11 +136,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="LCS.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="Task.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="LCS.cpp" />
     <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="Task.cpp" />
   </ItemGroup>
