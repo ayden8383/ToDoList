@@ -34,6 +34,8 @@ private:
 	static void radixPass(const std::vector<int>& in, std::vector<int>& out,
 		const std::vector<int>& keys, int offset, int n, int K);
 
+	static void dc3(const std::vector<int>& s, std::vector<int>& SA, int n, int K);
+
 
 	std::unordered_map<std::string, int> wordIds; // "buy" -> 1, "milk" -> 2, ...
 	std::vector<int> sequence; // every task's word IDs + separators + 0

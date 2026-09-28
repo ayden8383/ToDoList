@@ -12,15 +12,11 @@ LCS::LCS(const std::vector<Task>& tasks)
 	buildSuffixArrayNaive();
 	buildLCP();
 
-	//Tempoary
-	std::vector<int> keys = { 3, 1, 2, 1, 0 };
-	std::vector<int> in = { 0, 1, 2, 3, 4 };
-	std::vector<int> out(5);
-	radixPass(in, out, keys, 0, 5, 3);
+	// TEMPORARY dc3 test: "banana" with b=2, a=1, n=3
+	std::vector<int> s = { 2, 1, 3, 1, 3, 1, 0, 0, 0 };
+	std::vector<int> SA(6);
+	dc3(s, SA, 6, 3);
 
-	wxString line;
-	for (int pos : out) line << pos << " ";
-	wxLogDebug("radixPass: %s", line);
 }
 
 // One pass of stable counting sort, used by DC3.
@@ -47,6 +43,38 @@ void LCS::radixPass(const std::vector<int>& in, std::vector<int>& out,
 	for (int i = 0; i < n; i++) {
 		out[count[keys[in[i] + offset]]++] = in[i];
 	}
+}
+
+// DC3 (skew) suffix array construction, O(n).
+//  values 1..K, followed by three 0s of padding (s.size() == n + 3).
+// : output, the n suffix start positions in sorted order.
+void LCS::dc3(const std::vector<int>& s, std::vector<int>& SA, int n, int K)
+{
+	int n0 = (n + 2) / 3;  // positions with i mod 3 == 0
+	int n1 = (n + 1) / 3;  // i mod 3 == 1
+	int n2 = n / 3;        // i mod 3 == 2
+	int n02 = n0 + n2;     // sample size (includes a dummy mod 1 position when n0 > n1)
+
+	std::vector<int> s12(n02 + 3, 0);
+	std::vector<int> SA12(n02 + 3, 0);
+
+	// (i mod 3 != 0).
+	// n0 - n1 adds the dummy position n when n mod 3 == 1.
+	for (int i = 0, j = 0; i < n + (n0 - n1); i++) {
+		if (i % 3 != 0) {
+			s12[j++] = i;
+		}
+	}
+
+	// Sort the sample positions by their first 3 values, last value first
+	radixPass(s12, SA12, s, 2, n02, K);
+	radixPass(SA12, s12, s, 1, n02, K);
+	radixPass(s12, SA12, s, 0, n02, K);
+
+	// TEMPORARY part 2 test
+	wxString line;
+	for (int i = 0; i < n02; i++) line << SA12[i] << " ";
+	wxLogDebug("SA12: %s", line);
 }
 
 //format lists into a vector of words
