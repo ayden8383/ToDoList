@@ -71,10 +71,52 @@ void LCS::dc3(const std::vector<int>& s, std::vector<int>& SA, int n, int K)
 	radixPass(SA12, s12, s, 1, n02, K);
 	radixPass(s12, SA12, s, 0, n02, K);
 
-	// TEMPORARY part 2 test
-	wxString line;
-	for (int i = 0; i < n02; i++) line << SA12[i] << " ";
-	wxLogDebug("SA12: %s", line);
+	// Give each distinct triple a name (rank), in sorted order.
+	// Store names so s12 = [names of mod 1 positions | names of mod 2 positions], each in text order.
+	int name = 0;
+	int c0 = -1, c1 = -1, c2 = -1;
+	for (int i = 0; i < n02; i++) {
+		int p = SA12[i];
+
+		if (s[p] != c0 || s[p + 1] != c1 || s[p + 2] != c2) {
+			name++;
+			c0 = s[p];
+			c1 = s[p + 1];
+			c2 = s[p + 2];
+		}
+
+		if (p % 3 == 1) {
+			s12[p / 3] = name;       // left half: mod 1
+		}
+		else {
+			s12[p / 3 + n0] = name;  // right half: mod 2
+		}
+	}
+
+	if (name < n02) {
+		// Some triples tie: sort the suffixes of the name sequence recursively
+		dc3(s12, SA12, n02, name);
+
+		// s12[t] = rank of the sample suffix at index t
+		for (int i = 0; i < n02; i++) {
+			s12[SA12[i]] = i + 1;
+		}
+	}
+	else {
+		// Names are already unique ranks, so the sorted order follows directly
+		for (int i = 0; i < n02; i++) {
+			SA12[s12[i] - 1] = i;
+		}
+	}
+	//  SA12 holds indexes into s12, not original positions:
+	// t < n0 -> position 3t + 1,  t >= n0 -> position 3(t - n0) + 2
+
+	// TEMPORARY part 3 test
+	wxString namesLine, sa12Line;
+	for (int i = 0; i < n02; i++) namesLine << s12[i] << " ";
+	for (int i = 0; i < n02; i++) sa12Line << SA12[i] << " ";
+	wxLogDebug("names: %s", namesLine);
+	wxLogDebug("SA12 after: %s", sa12Line);
 }
 
 //format lists into a vector of words
