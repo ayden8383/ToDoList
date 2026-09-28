@@ -1,3 +1,4 @@
+#include <wx/log.h>   // temporary, for the radixPass test
 #include "LCS.h"
 #include <cctype>
 #include <algorithm>
@@ -10,6 +11,42 @@ LCS::LCS(const std::vector<Task>& tasks)
 	tokenize(tasks);
 	buildSuffixArrayNaive();
 	buildLCP();
+
+	//Tempoary
+	std::vector<int> keys = { 3, 1, 2, 1, 0 };
+	std::vector<int> in = { 0, 1, 2, 3, 4 };
+	std::vector<int> out(5);
+	radixPass(in, out, keys, 0, 5, 3);
+
+	wxString line;
+	for (int pos : out) line << pos << " ";
+	wxLogDebug("radixPass: %s", line);
+}
+
+// One pass of stable counting sort, used by DC3.
+// Sorts the first n positions in `in` by keys[pos + offset] (keys range 0..K) into `out`.
+// Stable: positions with equal keys keep their order from `in`.
+void LCS::radixPass(const std::vector<int>& in, std::vector<int>& out,
+	const std::vector<int>& keys, int offset, int n, int K)
+{
+	// Count how many positions have each key
+	std::vector<int> count(K + 1, 0);
+	for (int i = 0; i < n; i++) {
+		count[keys[in[i] + offset]]++;
+	}
+
+	// Prefix sum: count[key] becomes where the first position with that key goes
+	int sum = 0;
+	for (int key = 0; key <= K; key++) {
+		int keyCount = count[key];
+		count[key] = sum;
+		sum += keyCount;
+	}
+
+	// Place each position in its slot, going through `in` in order to keep it stable
+	for (int i = 0; i < n; i++) {
+		out[count[keys[in[i] + offset]]++] = in[i];
+	}
 }
 
 //format lists into a vector of words

@@ -1,4 +1,4 @@
-21
+28
 Work_on_assignment_report 0
 Buy_milk 1
 Work_on_assignment_code 0
@@ -20,3 +20,10 @@ Water_the_plants 0
 Fix_bike 0
 Pump_up_tyres 0
 Fix_bike_pump 0
+Buy_eggs 0
+Read_assignment 0
+Read_macbeth 0
+Buy_coke 0
+Buy_redbull 0
+Buy_Coke_and_Milk 0
+Read_to_kill_a_mockingbird 0
