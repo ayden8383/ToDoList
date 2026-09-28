@@ -22,10 +22,19 @@ void MainFrame::CreateControls()
 
 	headlineText = new wxStaticText(panel, wxID_ANY, "To-Do List", wxPoint(0, 22), wxSize(800, -1), wxALIGN_CENTER_HORIZONTAL);
 	headlineText->SetFont(headlineFont);
-	
+
 	inputField = new wxTextCtrl(panel, wxID_ANY, "", wxPoint(100, 80), wxSize(495, 35), wxTE_PROCESS_ENTER);
 	addButton = new wxButton(panel, wxID_ANY, "Add", wxPoint(600, 80), wxSize(100, 35));
-	checkListBox = new wxCheckListBox(panel, wxID_ANY, wxPoint(100, 120), wxSize(600, 400));
+
+	notebook = new wxNotebook(panel, wxID_ANY, wxPoint(100, 120), wxSize(600, 400));
+
+	checkListBox = new wxCheckListBox(notebook, wxID_ANY);
+	notebook->AddPage(checkListBox, "All tasks");
+
+	categoryTree = new wxTreeCtrl(notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+		wxTR_DEFAULT_STYLE | wxTR_HIDE_ROOT);
+	notebook->AddPage(categoryTree, "Categories");
+
 	clearButton = new wxButton(panel, wxID_ANY, "Clear", wxPoint(100, 525), wxSize(100, 35));
 }
 
@@ -36,37 +45,74 @@ void MainFrame::BindEventHandlers()
 	checkListBox->Bind(wxEVT_KEY_DOWN, &MainFrame::OnListKeyDown, this);
 	clearButton->Bind(wxEVT_BUTTON, &MainFrame::OnClearButtonClicked, this);
 	this->Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnWindowClosed, this);
+	notebook->Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, &MainFrame::OnTabChanged, this);
 }
 
 void MainFrame::AddSaveTasks()
 {
-	std::vector<Task> tasks = loadTaskFromFile("sample_tasks.txt");
-
-	LCS lcs(tasks);
-	wxString seqLine, taskLine;
-	for (int id : lcs.getSequence()) seqLine << id << " ";
-	for (int taskIndex : lcs.getOwner()) taskLine << taskIndex << " ";
-	wxLogDebug("sequence: %s", seqLine);
-	wxLogDebug("taskof:   %s", taskLine);
-
-	wxString saLine;
-	for (int pos : lcs.getSuffixArray()) saLine << pos << " ";
-	wxLogDebug("suffixArray: %s", saLine);
-
-	wxString lcpLine;
-	for (int len : lcs.getLCP()) lcpLine << len << " ";
-	wxLogDebug("lcp: %s", lcpLine);
-
-	for (const Category& category : lcs.findPhrases(2)) {
-		wxString line = category.phrase + ":";
-		for (int t : category.tasks) line << " " << t;
-		wxLogDebug("%s", line);
-	}
+	std::vector<Task> tasks = loadTaskFromFile("tasks.txt");
 
 	for (const Task& task : tasks) {
 		int index = checkListBox->GetCount();
 		checkListBox->Insert(task.desctiption, index);
 		checkListBox->Check(index, task.done);
+	}
+}
+
+void MainFrame::OnWindowClosed(wxCloseEvent& evt)
+{
+	saveTaskToFile(GetTasksFromList(), "tasks.txt");
+	evt.Skip();
+}
+
+// Reads the current tasks back out of the list box
+std::vector<Task> MainFrame::GetTasksFromList()
+{
+	std::vector<Task> tasks;
+
+	for (int i = 0; i < checkListBox->GetCount(); i++) {
+		Task task;
+		task.desctiption = checkListBox->GetString(i).ToStdString();
+		task.done = checkListBox->IsChecked(i);
+		tasks.push_back(task);
+	}
+
+	return tasks;
+}
+
+// Rebuild the categories whenever the Categories tab is opened
+void MainFrame::OnTabChanged(wxBookCtrlEvent& evt)
+{
+	if (evt.GetSelection() == 1) {
+		RefreshCategories();
+	}
+
+	evt.Skip();
+}
+
+void MainFrame::RefreshCategories()
+{
+	std::vector<Task> tasks = GetTasksFromList();
+
+	categoryTree->DeleteAllItems();
+	wxTreeItemId root = categoryTree->AddRoot("Categories"); // hidden by wxTR_HIDE_ROOT
+
+	LCS lcs(tasks);
+	std::vector<Category> categories = lcs.findPhrases(2);
+
+	if (categories.empty()) {
+		categoryTree->AppendItem(root, "No shared phrases yet");
+		return;
+	}
+
+	for (const Category& category : categories) {
+		wxString heading = wxString::Format("%s (%zu)", category.phrase, category.tasks.size());
+		wxTreeItemId categoryItem = categoryTree->AppendItem(root, heading);
+
+		for (int t : category.tasks) {
+			categoryTree->AppendItem(categoryItem, tasks[t].desctiption);
+		}
+
 	}
 }
 
@@ -113,20 +159,6 @@ void MainFrame::OnClearButtonClicked(wxCommandEvent& evt)
 	}
 }
 
-void MainFrame::OnWindowClosed(wxCloseEvent& evt)
-{
-	std::vector<Task> tasks;
-
-	for (int i = 0; i < checkListBox->GetCount(); i++) {
-		Task task;
-		task.desctiption = checkListBox->GetString(i);
-		task.done = checkListBox->IsChecked(i);
-		tasks.push_back(task);
-	}
-
-	saveTaskToFile(tasks, "tasks.txt");
-	evt.Skip();
-}
 
 void MainFrame::AddTaskFromInput()
 {

@@ -1,6 +1,9 @@
 #pragma once
 #include <wx/wx.h>
-
+#include <wx/notebook.h>
+#include <wx/treectrl.h>
+#include <vector>
+#include "Task.h"
 
 class MainFrame : public wxFrame
 {
@@ -22,12 +25,19 @@ private:
 	void moveSelectedTask(int offset);
 	void swapTasks(int i, int j);
 
+	void OnTabChanged(wxBookCtrlEvent& evt);
+	void RefreshCategories();
+
 	wxPanel* panel;
 	wxStaticText* headlineText;
 	wxTextCtrl* inputField;
 	wxButton* addButton;
 	wxCheckListBox* checkListBox;
 	wxButton* clearButton;
+	wxNotebook* notebook;
+	wxTreeCtrl* categoryTree;
+
+	std::vector<Task> GetTasksFromList();
 
 };
 
