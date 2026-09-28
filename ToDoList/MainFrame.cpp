@@ -57,6 +57,12 @@ void MainFrame::AddSaveTasks()
 	for (int len : lcs.getLCP()) lcpLine << len << " ";
 	wxLogDebug("lcp: %s", lcpLine);
 
+	for (const Category& category : lcs.findPhrases(2)) {
+		wxString line = category.phrase + ":";
+		for (int t : category.tasks) line << " " << t;
+		wxLogDebug("%s", line);
+	}
+
 	for (const Task& task : tasks) {
 		int index = checkListBox->GetCount();
 		checkListBox->Insert(task.desctiption, index);

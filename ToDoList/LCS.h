@@ -3,15 +3,25 @@
 #include<vector>	
 #include <unordered_map>
 #include "Task.h"
+
+struct Category 
+{
+	std::string phrase;
+	int length;
+	std::vector<int> tasks;
+};
+
 class LCS
 {
 public:
 	LCS(const std::vector<Task>& tasks);
 
+
 	const std::vector<int>& getSequence() const { return sequence; }
 	const std::vector<int>& getOwner() const { return taskof; }
 	const std::vector<int>& getSuffixArray() const { return suffixArray; }
 	const std::vector<int>& getLCP() const { return lcp; }
+	std::vector<Category> findPhrases(int k) const;
 
 private:
 	void tokenize(const std::vector<Task>& tasks);

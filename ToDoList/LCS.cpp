@@ -2,6 +2,8 @@
 #include <cctype>
 #include <algorithm>
 #include <numeric>
+#include <map>
+#include <set>
 
 LCS::LCS(const std::vector<Task>& tasks)
 {
@@ -121,4 +123,68 @@ void LCS::buildLCP()
 			h--;
 		}
 	}
+}
+
+// Finds phrases of  k words shared by 2 or more tasks.
+// A run of lcp >= k means those neighboring suffixes all start with the same phrase.
+std::vector<Category> LCS::findPhrases(int k) const
+{
+	int n = static_cast<int>(sequence.size());
+
+	// Reverse of wordIds, so a phrase's IDs can be turned back into words
+	std::vector<std::string> idToWord(wordIds.size() + 1);
+	for (const auto& entry : wordIds) {
+		idToWord[entry.second] = entry.first;
+	}
+
+	std::vector<Category> categories;
+	std::map<std::vector<int>, int> categoryOf; 
+
+	int i = 1;
+	while (i < n) {
+		if (lcp[i] < k) {
+			i++;
+			continue;
+		}
+
+		// The run covers suffixArray[start] up to suffixArray[i - 1]
+		int start = i - 1;
+		int length = lcp[i];
+		while (i < n && lcp[i] >= k) {
+			length = std::min(length, lcp[i]);
+			i++;
+		}
+
+		std::set<int> taskSet;
+		for (int j = start; j < i; j++) {
+			taskSet.insert(taskof[suffixArray[j]]);
+		}
+
+		if (taskSet.size() < 2) {
+			continue; 
+		}
+
+		// Turn the shared word IDs back into text
+		int pos = suffixArray[start];
+		std::string phrase;
+		for (int w = 0; w < length; w++) {
+			if (w > 0) phrase += ' ';
+			phrase += idToWord[sequence[pos + w]];
+		}
+
+		std::vector<int> tasks(taskSet.begin(), taskSet.end());
+
+		// One category per set of tasks, named after the longest phrase
+		auto found = categoryOf.find(tasks);
+		if (found == categoryOf.end()) {
+			categoryOf[tasks] = static_cast<int>(categories.size());
+			categories.push_back(Category{ phrase, length, tasks });
+		}
+		else if (length > categories[found->second].length) {
+			categories[found->second].phrase = phrase;
+			categories[found->second].length = length;
+		}
+	}
+
+	return categories;
 }
