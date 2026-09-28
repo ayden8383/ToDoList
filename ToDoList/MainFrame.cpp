@@ -1,4 +1,5 @@
 #include "MainFrame.h"
+#include "LCS.h"
 #include <wx/wx.h>
 #include <vector>
 #include <string>
@@ -39,7 +40,14 @@ void MainFrame::BindEventHandlers()
 
 void MainFrame::AddSaveTasks()
 {
-	std::vector<Task> tasks = loadTaskFromFile("tasks.txt");
+	std::vector<Task> tasks = loadTaskFromFile("sample_tasks.txt");
+
+	LCS lcs(tasks);
+	wxString seqLine, taskLine;
+	for (int id : lcs.getSequence()) seqLine << id << " ";
+	for (int taskIndex : lcs.getOwner()) taskLine << taskIndex << " ";
+	wxLogDebug("sequence: %s", seqLine);
+	wxLogDebug("taskof:   %s", taskLine);
 
 	for (const Task& task : tasks) {
 		int index = checkListBox->GetCount();
