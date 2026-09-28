@@ -17,6 +17,15 @@ LCS::LCS(const std::vector<Task>& tasks)
 	std::vector<int> SA(6);
 	dc3(s, SA, 6, 3);
 
+	std::vector<int> m = { 2, 1, 4, 4, 1, 4, 4, 1, 3, 3, 1, 0, 0, 0 }; // mississippi
+	std::vector<int> SAm(11);
+	dc3(m, SAm, 11, 4);
+
+	wxString bananaLine, missLine;
+	for (int pos : SA) bananaLine << pos << " ";
+	for (int pos : SAm) missLine << pos << " ";
+	wxLogDebug("banana SA: %s", bananaLine);
+	wxLogDebug("mississippi SA: %s", missLine);
 }
 
 // One pass of stable counting sort, used by DC3.
@@ -43,6 +52,17 @@ void LCS::radixPass(const std::vector<int>& in, std::vector<int>& out,
 	for (int i = 0; i < n; i++) {
 		out[count[keys[in[i] + offset]]++] = in[i];
 	}
+}
+
+// Lexicographic <= for pairs and triples, used by the DC3 merge
+static bool leq(int a1, int a2, int b1, int b2)
+{
+	return a1 < b1 || (a1 == b1 && a2 <= b2);
+}
+
+static bool leq(int a1, int a2, int a3, int b1, int b2, int b3)
+{
+	return a1 < b1 || (a1 == b1 && leq(a2, a3, b2, b3));
 }
 
 // DC3 (skew) suffix array construction, O(n).
@@ -120,10 +140,47 @@ void LCS::dc3(const std::vector<int>& s, std::vector<int>& SA, int n, int K)
 	}
 	radixPass(s0, SA0, s, 0, n0, K);
 
-	// TEMPORARY part 4 test
-	wxString sa0Line;
-	for (int i = 0; i < n0; i++) sa0Line << SA0[i] << " ";
-	wxLogDebug("SA0: %s", sa0Line);
+	// Converts an index into s12 (taken from SA12[t]) back to an original position
+	auto positionOf = [&](int t) {
+		return (SA12[t] < n0) ? SA12[t] * 3 + 1 : (SA12[t] - n0) * 3 + 2;
+		};
+
+	// Merge the sample suffixes (SA12) with the mod 0 suffixes (SA0), like merge sort
+	int p = 0;          // next in SA0
+	int t = n0 - n1;    // next in SA12, skipping the dummy if there is one
+	for (int k = 0; k < n; k++) {
+		int i = positionOf(t);  // sample suffix
+		int j = SA0[p];         // mod 0 suffix
+
+		bool sampleFirst;
+		if (SA12[t] < n0) {
+			// mod 1 vs mod 0: 1 value, then ranks of i + 1 (mod 2) and j + 1 (mod 1)
+			sampleFirst = leq(s[i], s12[SA12[t] + n0],
+				s[j], s12[j / 3]);
+		}
+		else {
+			// mod 2 vs mod 0: 2 values, then ranks of i + 2 (mod 1) and j + 2 (mod 2)
+			sampleFirst = leq(s[i], s[i + 1], s12[SA12[t] - n0 + 1],
+				s[j], s[j + 1], s12[j / 3 + n0]);
+		}
+
+		if (sampleFirst) {
+			SA[k] = i;
+			t++;
+			if (t == n02) {
+				// Sample list used up: copy the rest of SA0
+				for (k++; p < n0; p++, k++) SA[k] = SA0[p];
+			}
+		}
+		else {
+			SA[k] = j;
+			p++;
+			if (p == n0) {
+				// SA0 used up: copy the rest of the sample list
+				for (k++; t < n02; t++, k++) SA[k] = positionOf(t);
+			}
+		}
+	}
 }
 
 //format lists into a vector of words
