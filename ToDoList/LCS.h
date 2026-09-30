@@ -23,14 +23,15 @@ public:
 	const std::vector<int>& getLCP() const { return lcp; }
 	std::vector<Category> findPhrases(int k) const;
 
+	// Public so the Benchmark project can time them directly
+	void buildSuffixArrayNaive(); //brute force approach
+	void buildSuffixArrayDC3(); //Actual algorithm we want to use
+
 private:
 	void tokenize(const std::vector<Task>& tasks);
 	static std::vector<std::string> splitWords(const std::string& text);
 
-	void buildSuffixArrayNaive(); //brute force approach
 	void buildLCP();
-
-	void buildSuffixArrayDC3(); //Actual algorithm we want to use
 
 	//radixPass for DC3 construction
 	static void radixPass(const std::vector<int>& in, std::vector<int>& out,
