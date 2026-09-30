@@ -4,7 +4,7 @@ A wxWidgets to-do list app that groups tasks by shared phrases, using a
 suffix array (DC3) and an LCP array (Kasai's algorithm).
 
 ## Submission
-- **Report:** [docs/Report.pdf](docs/Report.pdf)
+- **Report:** Suffix-Array-Report-AydenTran-24923017.pdf
 - **Video walkthrough:** [link or docs/Walkthrough.mp4]
 - **Runnable app (Windows x64):** see the latest [Release](../../releases)
 
